@@ -1,6 +1,6 @@
 name: spherical_harmonic_definitions
 channels:
-  - defaults
+  - conda-forge
 dependencies:
   - jupyterlab
   - matplotlib
@@ -11,6 +11,7 @@ dependencies:
   - python=3.12
   - ipykernel
   - ipython
+  - jupyter-cache
   - pip:
     - spharpy<1.0.0
 prefix: ./env/spherical_harmonic_definitions
