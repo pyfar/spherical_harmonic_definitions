@@ -1,0 +1,17 @@
+
+env/
+.lprof/
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pkl
+*.pklz
+*.pyd
+*.so
+*.egg-info/
+*.eggs/
+
+/.quarto/
+_output/

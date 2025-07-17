@@ -1,0 +1,16 @@
+name: spherical_harmonic_definitions
+channels:
+  - defaults
+dependencies:
+  - jupyterlab
+  - matplotlib
+  - numpy
+  - scipy=1.15
+  - sympy
+  - pip
+  - python=3.12
+  - ipykernel
+  - ipython
+  - pip:
+    - spharpy<1.0.0
+prefix: ./env/spherical_harmonic_definitions
