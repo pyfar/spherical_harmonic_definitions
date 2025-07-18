@@ -12,6 +12,7 @@ dependencies:
   - ipykernel
   - ipython
   - jupyter-cache
+  - quarto
   - pip:
     - spharpy<1.0.0
 prefix: ./env/spherical_harmonic_definitions
