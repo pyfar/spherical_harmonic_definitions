@@ -8,12 +8,12 @@ Numeric implementations using numpy are derived from symbolic equations.
 Create and activate the environment
 
 ```shell
-conda env create -f environment.yml --prefix ./env/spherical_harmonic_definitionsv
+conda env create -f environment.yml --prefix ./env/spherical_harmonic_definitions
 conda activate env/spherical_harmonic_definitions
 ```
 
 Compile the document using quarto
 
 ```shell
-quarto render /Users/marco/ITA/projects/pyfar/misc/spherical_harmonic_definitions/definitions.qmd --to all
+quarto render definitions.qmd --to all
 ```
