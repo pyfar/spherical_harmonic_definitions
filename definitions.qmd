@@ -256,7 +256,7 @@ print_equation(P_n_zotter, 'P_n(x)', label='eq-legendre-poly-zotter-frank')
 print_equation(P_nm_zotter, 'P_n^m(x)', label='eq-legendre-func-zotter-frank')
 ```
 
-Note that the multiplication with $(-1)^n$ in @eq-legendre-poly-zotter-frank changes the sign of $(x^2-1)^n = (-1)^n (1-x^2)^n$, which is used in @eq-legendre_func_williams_full. In contrast to @@eq-legendre_func_williams_full, @eq-legendre-poly-zotter-frank does not require considering two cases, but is equally valid for positive and negative $m$.
+Note that the multiplication with $(-1)^n$ in @eq-legendre-poly-zotter-frank changes the sign of $(x^2-1)^n = (-1)^n (1-x^2)^n$, which is used in @eq-legendre_func_williams_full. In contrast to @eq-legendre_func_williams_full, @eq-legendre-poly-zotter-frank does not require considering two cases, but is equally valid for positive and negative $m$.
 
 Importantly, the definitions in @eq-legendre_func_williams_full and @eq-legendre-poly-zotter-frank are fully equivalent.
 @fig-legendre-zotter-frank shows a plot of the associated Legendre functions as defined in @eq-legendre-poly-zotter-frank for the interval $x \in [-1, 1]$.
