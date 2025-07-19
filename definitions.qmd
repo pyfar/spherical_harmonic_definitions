@@ -27,6 +27,19 @@ execute:
 
 ---
 
+# Symbols
+
+| Symbol | Explanation |
+|--------|-------------|
+| $\theta \in [0, \pi]$ | The colatitute angle |
+| $\phi \in [0, 2\pi]$ | The azimuth angle |
+| $n \le 0$ | The (spherical harmonic) order |
+| $m$ | The (spherical harmonic) degree |
+| $P_n(x)$ | The Legendre polynomial of order $n$ for real valued arguments $x \in [-1, 1]$ |
+| $P_n^m(x)$ | The associated Legendre function of order $n$ and degree $m$ for real valued arguments $x \in [-1, 1]$ |
+| $\bar{Y}_n^m(\theta, \phi)$ | The complex valued spherical harmonics of order $n$ and degree $m$ for colatitude and azimuth angles $(\theta, \phi)$ |
+| $Y_n^m(\theta, \phi)$ | The real valued spherical harmonics of order $n$ and degree $m$ for colatitude and azimuth angles $(\theta, \phi)$ |
+
 # Associated Legendre Functions
 
 ```{python}
