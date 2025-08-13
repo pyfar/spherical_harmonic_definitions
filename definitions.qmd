@@ -54,7 +54,10 @@ import matplotlib as mpl
 from matplotlib.colorbar import Colorbar
 
 
-def plot_legendre_funcs(P_n_m_funcs, n_max=2):
+def plot_legendre_funcs(P_n_m_funcs, n_max=2, scipy=True, sharey=False, axis='off'):
+
+    if type(P_n_m_funcs) is dict:
+        P_n_m_funcs = [P_n_m_funcs]
 
     import warnings
     warnings.filterwarnings(
@@ -66,7 +69,7 @@ def plot_legendre_funcs(P_n_m_funcs, n_max=2):
 
     f, axs = plt.subplots(
         n_max+1, 2*n_max+1,
-        figsize=(8, 4), sharex=True, sharey=False)
+        figsize=(8, 4), sharex=True, sharey=sharey)
 
     for acn in range((n_max+1)**2):
         n, m = spharpy.spherical.acn2nm(acn)
@@ -74,26 +77,39 @@ def plot_legendre_funcs(P_n_m_funcs, n_max=2):
         ax = axs[n, idx_m]
 
         ax.set_title('$P_{' + str(n) + '}^{' + str(m) + '}(x)$')
-        func = P_n_m_funcs[(n, m)]
-        P_n_m_lambdified = sym.lambdify(
-            (x), func, 'numpy', cse=True)
+        for P_nm_func in P_n_m_funcs:
+            func = P_nm_func[(n, m)]
+            P_n_m_lambdified = sym.lambdify(
+                (x), func, 'numpy', cse=True)
 
-        ax.plot(
-            xx,
-            np.broadcast_to(np.asarray(P_n_m_lambdified(xx)), xx.shape),
-            label=f'$P_{{{n}}}^{{{m}}}(x)$')
-        ax.plot(
-            xx,
-            lpmv(m, n, xx),
-            label=f'$P_{{{n}}}^{{{m}}}(x)$ (SciPy)',
-            linestyle=':', color='k')
+            ax.plot(
+                xx,
+                np.broadcast_to(np.asarray(P_n_m_lambdified(xx)), xx.shape),
+                label=f'$P_{{{n}}}^{{{m}}}(x)$')
 
-    handles, labels = ax.get_legend_handles_labels()
-    axs[0, 0].legend(handles, ['Test', 'SciPy'])
+        if scipy is True:
+            ax.plot(
+                xx,
+                lpmv(m, n, xx),
+                label=f'$P_{{{n}}}^{{{m}}}(x)$ (SciPy)',
+                linestyle=':', color='k')
+
+    if scipy is True:
+        handles, labels = ax.get_legend_handles_labels()
+        axs[0, 0].legend(handles, ['Test', 'SciPy'])
 
     for ax in axs.flat:
-        ax.axis('off')
+        ax.axis(axis)
+
+    for n in range(n_max+1):
+        for m in range(n+1, n_max+1):
+            ax = axs[n, m + (2*n_max+1)//2]
+            ax.axis('off')
+            ax = axs[n, -m + (2*n_max+1)//2]
+            ax.axis('off')
+
     plt.tight_layout()
+    return axs
 
 
 def print_equation(expression, lhs=None, label=None):
@@ -135,7 +151,9 @@ The respective sympy code is
 def legendre_poly_williams(n, x):
     return 1 / (2**n * sym.factorial(n)) * sym.Derivative((x**2 - 1)**n, (x, n))
 
-P_n = legendre_poly_williams(n, x)
+with sym.evaluate(False):
+    P_n = legendre_poly_williams(n, x)
+
 print_equation(P_n, 'P_n(x)', 'eq-legendre_poly_williams')
 
 ```
@@ -213,7 +231,7 @@ for nn in range(1, 4):
 ```
 which are in accordance with Chap. 5 in @Williams1999.
 
-@fig-legendre-williams-rafaely shows a plot of the associated Legendre functions as defined in @eq-legendre_func_williams_full for the interval $x \in [-1, 1]$.
+[Fig. @fig-legendre-williams-rafaely] shows a plot of the associated Legendre functions as defined in [Eq. @eq-legendre_func_williams_full] for the interval $x \in [-1, 1]$.
 
 ```{python}
 #| fig-cap: The associated Legendre functions as defined in @eq-legendre_func_williams (see @Williams1999 and @Rafaely2019) for $x \in [-1, 1]$. Note that the definition coincides with the definition used in scipy.
@@ -225,7 +243,7 @@ for nn in range(n_max+1):
         P_n_m_funcs[(nn, mm)] = P_nm_pw.subs(
             P_n_symbol, P_n).subs(n, nn).subs(m, mm).doit().simplify()
 
-plot_legendre_funcs(P_n_m_funcs, n_max=n_max)
+plot_legendre_funcs(P_n_m_funcs, n_max=n_max);
 ```
 
 ## Zotter and Frank (2019)
@@ -269,15 +287,12 @@ P_n_m_funcs = {
     (nn, mm): P_nm_zotter.subs(n, nn).subs(m, mm).doit().simplify()
     for nn in range(n_max+1) for mm in range(-nn, nn + 1)}
 
-plot_legendre_funcs(P_n_m_funcs, n_max=n_max)
+plot_legendre_funcs(P_n_m_funcs, n_max=n_max);
 ```
 
 ## AES69-2022
 
 The @AES69-2022 defines the associated Legendre functions as
-<!-- $$
-P_n^{m}(x) = \frac{1}{2^n n!} (1-x^2)^{m/2} \frac{\mathrm{d}^{n+m}}{\mathrm{d}x^{n+m}}(x^2-1)^n
-$$ -->
 ```{python}
 #| output: asis
 P_nm_aes = 1 / (2**n * sym.factorial(n)) * (1 - x**2)**(m/2) * sym.Derivative((x**2 - 1)**n, (x, n + m))
@@ -296,5 +311,86 @@ P_n_m_funcs = {
     (n, m): 1 / (2**n * sym.factorial(n)) * (1 - x**2)**(m/2) * sym.diff((x**2 - 1)**n, x, n + m)
     for n in range(5) for m in range(-n, n + 1)}
 
-plot_legendre_funcs(P_n_m_funcs, n_max=n_max)
+plot_legendre_funcs(P_n_m_funcs, n_max=n_max);
 ```
+
+## Normalization of the Associated Legendre Functions
+
+### Positive and negative $m$
+
+```{python}
+
+theta, phi = sym.symbols(r'\theta \phi', real=True, positive=True)
+n, m = sym.symbols('n m', integer=True)
+```
+
+```{python}
+
+from sympy.functions.special.polynomials import assoc_legendre
+P_nm_williams = assoc_legendre(n, m, x)
+
+with sym.evaluate(False):
+    N_nm_n3d_williams = sym.sqrt((2*n+1)/(4*sym.pi) * sym.factorial(n-m)/sym.factorial(n+m))
+    N_nm_sn3d_williams = sym.sqrt(1/(4*sym.pi) * sym.factorial(n-m)/sym.factorial(n+m))
+    N_nm_unit_williams = sym.sqrt(sym.factorial(n-m)/sym.factorial(n+m))
+
+```
+
+
+```{python}
+#| output: asis
+print_equation(N_nm_n3d_williams)
+```
+
+
+```{python}
+#| output: asis
+print_equation(N_nm_sn3d_williams)
+```
+
+
+```{python}
+#| output: asis
+print_equation(N_nm_unit_williams)
+```
+
+```{python}
+P_nm_norm_n3d = {}
+P_nm_norm_sn3d = {}
+P_nm_norm_unit = {}
+for nn in range(3+1):
+    for mm in range(-nn, nn+1):
+        # display((N_nm_williams * P_nm_williams).subs(n, nn).subs(m, mm).expand(func=True))
+        P_nm_norm_n3d[(nn, mm)] = (N_nm_n3d_williams * P_nm_williams).subs(n, nn).subs(m, mm)
+        P_nm_norm_sn3d[(nn, mm)] = (N_nm_sn3d_williams * P_nm_williams).subs(n, nn).subs(m, mm)
+        P_nm_norm_unit[(nn, mm)] = (N_nm_unit_williams * P_nm_williams).subs(n, nn).subs(m, mm)
+
+
+axs = plot_legendre_funcs([P_nm_norm_n3d, P_nm_norm_sn3d, P_nm_norm_unit], n_max=3, scipy=False, sharey=True, axis='on')
+```
+
+### Positive $|m|$ only
+```{python}
+
+P_nm_zotter = assoc_legendre(n, sym.Abs(m), x)
+N_nm_zotter = sym.sqrt((2*n+1) * sym.factorial(n-sym.Abs(m))/sym.factorial(n+sym.Abs(m)))
+# N_nm_williams = sym.sqrt(sym.factorial(n-m)/sym.factorial(n+m))
+
+P_nm_norm = {}
+for nn in range(3+1):
+    for mm in range(-nn, nn+1):
+        # display((N_nm_zotter * P_nm_zotter).subs(n, nn).subs(m, mm).expand(func=True))
+        P_nm_norm[(nn, mm)] = (N_nm_zotter * P_nm_zotter).subs(n, nn).subs(m, mm)
+
+```
+
+```{python}
+#| output: asis
+print_equation(N_nm_zotter*P_nm_zotter)
+```
+
+```{python}
+plot_legendre_funcs(P_nm_norm, n_max=3, scipy=False, sharey=True, axis='on');
+```
+
+
